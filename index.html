@@ -245,8 +245,9 @@ const VNOTE_DONE = '완료 차수는 실제 참석 인원, 나머지 차수는 �
 // 인원·지원금은 data.js(매일 갱신)에서 읽는다
 const DATA = window.SIM_DATA;
 const DEFAULT_BUDGET = DATA.budget;
-// 기준일이 바뀌면 보는 사람이 바꿔 둔 값 대신 새 현황을 보여 준다
-const STORE = 'kearney-ax-fee-sim-' + DATA.asOf;
+// data.js 내용이 조금이라도 바뀌면(인원·지원금·기준일) 보는 사람이 바꿔 둔 값 대신 새 현황을 보여 준다
+const DATA_JSON = JSON.stringify(DATA);
+const STORE = 'kearney-ax-fee-sim-' + [...DATA_JSON].reduce((h, ch) => (h * 31 + ch.charCodeAt(0)) >>> 0, 7).toString(36);
 
 const COURSES = [
   { id:'mid', name:'컨설턴트 중급', color:'var(--c1)', price:1680000,
@@ -539,7 +540,14 @@ function initAdmin(){
     try{
       const cur = await fetch(api + '?ref=main', { headers, cache: 'no-store' });
       if (!cur.ok) throw cur;
-      const { sha } = await cur.json();
+      const { sha, content } = await cur.json();
+      // 브라우저가 예전 data.js를 보여 주고 있으면, 그 값으로 새 현황을 덮어쓰지 않게 막는다
+      const remote = {};
+      new Function('window', new TextDecoder().decode(Uint8Array.from(atob(content.replace(/\s/g, '')), ch => ch.charCodeAt(0))))(remote);
+      if (JSON.stringify(remote.SIM_DATA) !== DATA_JSON){
+        step = 'stale';
+        throw new Error('stale');
+      }
       step = 'write';
       const res = await fetch(api, { method: 'PUT', headers: { ...headers, 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: `${asOf} 모집현황 반영 (페이지에서 저장)`, content: utf8b64(dataJs(asOf)), sha, branch: 'main' }) });
@@ -548,6 +556,7 @@ function initAdmin(){
     }catch(err){
       const st = err && err.status;
       const denied = st === 403 || st === 404;
+      if (step === 'stale') return msg('이 화면이 예전 현황을 보여 주고 있어 저장하지 않았습니다. 1~2분 뒤 새로고침(Ctrl+F5)하고 다시 입력해 저장해 주세요.', 'err');
       msg((st === 401 ? 'GitHub 키가 맞지 않거나 기한이 지났습니다. 키를 다시 넣어 주세요.'
         : denied && step === 'read' ? '이 키로는 KEARNEY 저장소에 접근할 수 없습니다. 키 설정의 Repository access에 IGM-HRD/KEARNEY가 선택돼 있는지 확인해 주세요.'
         : denied ? '이 키는 읽기만 됩니다. 키 설정의 Permissions에서 Contents를 Read and write로 바꿔 주세요.'
