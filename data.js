@@ -4,7 +4,7 @@
 //  - excl: 청구 제외 인원 (파트너&임원 과정만)
 //  - note: 메모 (페이지에는 보이지 않음)
 window.SIM_DATA = {
-  asOf: '2026-10-26',
+  asOf: '2026-10-27',
   budget: 318000000,
   sessions: {
     'mid-1': { n: 30, done: true },
@@ -17,7 +17,7 @@ window.SIM_DATA = {
     'adv-2': { n: 35 },
 
     'p-1': { n: 10, excl: 6, done: true },
-    'p-2': { n: 20, excl: 12, note: "명단 24명 중 4명 불참, MS 임원 2명 제외" },
+    'p-2': { n: 20, excl: 12 },
 
     'ms-1': { n: 6, done: true },
     'ms-2': { n: 5 },
