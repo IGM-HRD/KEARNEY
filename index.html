@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>커니 AX 교육비 시뮬레이션</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.css">
+<style>
+:root{
+  color-scheme: light;
+  --bg:#e6eaf0;
+  --sh-d:rgba(160,174,196,.6); --sh-l:rgba(255,255,255,.95);
+  --text-1:#18202c; --text-2:#4d5868; --text-3:#7d8899;
+  --line:rgba(110,125,150,.2);
+  --c1:#2a78d6; --c2:#eb6834; --c3:#1baf7a; --c4:#c98a00;
+  --good:#0b8f0b; --warn:#b87800; --crit:#d03b3b;
+  --accent:#2a78d6;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme: dark;
+    --bg:#252a32;
+    --sh-d:rgba(0,0,0,.5); --sh-l:rgba(255,255,255,.05);
+    --text-1:#eef1f6; --text-2:#b9c1cd; --text-3:#8a94a3;
+    --line:rgba(200,210,230,.13);
+    --c1:#4a92e8; --c2:#e06a3a; --c3:#22b07f; --c4:#d9a21c;
+    --good:#3cc23c; --warn:#fab219; --crit:#ec7272;
+    --accent:#4a92e8;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --bg:#252a32;
+  --sh-d:rgba(0,0,0,.5); --sh-l:rgba(255,255,255,.05);
+  --text-1:#eef1f6; --text-2:#b9c1cd; --text-3:#8a94a3;
+  --line:rgba(200,210,230,.13);
+  --c1:#4a92e8; --c2:#e06a3a; --c3:#22b07f; --c4:#d9a21c;
+  --good:#3cc23c; --warn:#fab219; --crit:#ec7272;
+  --accent:#4a92e8;
+}
+
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:var(--bg); color:var(--text-1);
+  font-family:"Pretendard Variable",Pretendard,-apple-system,"Malgun Gothic","Apple SD Gothic Neo",sans-serif;
+  font-size:14px; line-height:1.5; -webkit-font-smoothing:antialiased;
+  font-variant-numeric:tabular-nums; min-height:100vh;
+}
+.wrap{max-width:1280px; margin:0 auto; padding:32px 24px 56px}
+
+/* surfaces */
+.card{background:var(--bg); border-radius:24px; padding:22px; box-shadow:10px 10px 22px var(--sh-d), -10px -10px 22px var(--sh-l)}
+.inset{background:var(--bg); border-radius:14px; box-shadow:inset 4px 4px 9px var(--sh-d), inset -4px -4px 9px var(--sh-l)}
+.raised{background:var(--bg); border-radius:12px; box-shadow:4px 4px 9px var(--sh-d), -4px -4px 9px var(--sh-l)}
+
+/* header */
+.top{display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:space-between; gap:16px; margin-bottom:26px}
+.eyebrow{font-size:12px; font-weight:700; letter-spacing:.06em; color:var(--text-3)}
+h1{margin:4px 0 6px; font-size:26px; font-weight:800; letter-spacing:-.02em}
+.sub{color:var(--text-2); font-size:13px}
+.btn{border:0; font:inherit; font-size:12.5px; font-weight:700; color:var(--text-2); cursor:pointer; padding:10px 16px}
+.btn:active{box-shadow:inset 3px 3px 7px var(--sh-d), inset -3px -3px 7px var(--sh-l)}
+
+/* summary */
+.summary{display:grid; grid-template-columns:1.25fr 1fr; gap:22px; margin-bottom:30px}
+.budget h2, .kpis h2{margin:0 0 14px; font-size:15px; font-weight:800; display:flex; justify-content:space-between; align-items:center; gap:10px}
+.budget h2{flex-wrap:wrap}
+.bin{display:flex; align-items:center; gap:8px; font-size:12.5px; color:var(--text-2); font-weight:600; white-space:nowrap}
+.verdict b{white-space:nowrap}
+.verdict .vnote{display:block; margin-top:4px; font-size:12px; font-weight:500; color:var(--text-2)}
+.bin input{width:150px; height:34px; border:0; padding:0 12px; text-align:right; font:inherit; font-size:14px; font-weight:800; color:var(--text-1); outline:none}
+.bin input:focus{outline:2px solid var(--accent); outline-offset:1px}
+.gauge{margin:18px 0 6px; display:flex; align-items:center; gap:14px}
+.gauge .pv{font-size:30px; font-weight:800; letter-spacing:-.02em; min-width:96px}
+.bar{flex:1; height:18px; padding:4px; border-radius:999px}
+.bar i{display:block; height:100%; border-radius:999px; transition:width .25s, background .25s}
+.glabel{display:flex; justify-content:space-between; font-size:11.5px; color:var(--text-3); font-weight:600; margin-left:110px}
+.bgrid{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin-top:18px}
+.bx{padding:14px 16px}
+.bx .k{font-size:11.5px; color:var(--text-3); font-weight:700}
+.bx .v{font-size:19px; font-weight:800; letter-spacing:-.02em; margin-top:3px}
+.bx .d{font-size:11.5px; color:var(--text-2); margin-top:2px}
+.verdict{margin-top:16px; padding:13px 16px; font-size:13px; font-weight:700; display:flex; align-items:center; gap:10px}
+.verdict .dot{width:10px; height:10px; border-radius:50%; flex:none}
+
+.kpis .grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px}
+.kpi{padding:16px 18px}
+.kpi .k{font-size:12px; font-weight:700; color:var(--text-3)}
+.kpi .v{font-size:24px; font-weight:800; letter-spacing:-.02em; margin-top:4px; line-height:1.2}
+.kpi .v small{font-size:13px; font-weight:700; color:var(--text-2); margin-left:2px}
+.kpi .d{font-size:11.5px; color:var(--text-2); margin-top:5px}
+.kpi.em .v{color:var(--accent)}
+
+.up{color:var(--good)} .down{color:var(--crit)}
+
+/* courses */
+.section-h{display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; gap:8px; margin:0 4px 16px}
+.section-h h2{font-size:17px; margin:0; font-weight:800}
+.section-h p{margin:0; color:var(--text-3); font-size:12.5px}
+.cols{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:20px; align-items:start}
+.col h3{margin:0; font-size:15.5px; font-weight:800; display:flex; align-items:center; gap:8px}
+.sw{width:10px; height:10px; border-radius:3px; flex:none}
+.meta{color:var(--text-3); font-size:12px; margin-top:3px}
+.big{font-size:23px; font-weight:800; letter-spacing:-.02em; margin:14px 0 0}
+.big-l{font-size:11.5px; color:var(--text-3); font-weight:600}
+.sess{margin-top:14px; padding:10px 10px 10px 12px; display:flex; flex-direction:column; gap:9px}
+.srow{display:grid; grid-template-columns:1fr auto; align-items:center; gap:8px}
+.slabel{font-size:12.5px; font-weight:700; line-height:1.35; display:flex; flex-wrap:wrap; align-items:center; gap:5px; word-break:keep-all}
+.sdate{font-size:11px; color:var(--text-3); font-weight:500; white-space:nowrap}
+.done{font-size:10px; font-weight:800; color:var(--text-3); padding:1px 6px; border-radius:999px; background:var(--line)}
+.step{display:inline-flex; align-items:center; gap:4px}
+.step button{width:26px; height:26px; border:0; font:inherit; font-size:15px; font-weight:700; color:var(--text-2); cursor:pointer; display:grid; place-items:center; padding:0}
+.step button:active{box-shadow:inset 2px 2px 5px var(--sh-d), inset -2px -2px 5px var(--sh-l)}
+.step input{width:44px; height:30px; text-align:center; border:0; font:inherit; font-weight:800; font-size:14px; color:var(--text-1); outline:none; -moz-appearance:textfield}
+.step input::-webkit-outer-spin-button, .step input::-webkit-inner-spin-button{-webkit-appearance:none; margin:0}
+.step input:focus{outline:2px solid var(--accent); outline-offset:1px}
+.excl{display:flex; align-items:center; justify-content:flex-end; gap:6px; font-size:11px; color:var(--text-3); margin-top:-3px}
+.excl input{width:40px; height:22px; font-size:12px; text-align:center; border:0; font-weight:700; color:var(--text-1); font-family:inherit; outline:none}
+.sumr{margin-top:14px}
+.sumr .r{display:flex; justify-content:space-between; gap:10px; padding:6px 0; font-size:12.5px; border-bottom:1px dashed var(--line)}
+.sumr .r:last-child{border-bottom:0}
+.sumr .r span{color:var(--text-2)}
+.sumr .r b{font-weight:700}
+
+/* notes */
+.notes{margin-top:30px}
+.notes h4{margin:0 0 8px; font-size:14px; font-weight:800}
+.notes ul{margin:0; padding-left:18px; color:var(--text-2); font-size:12.5px}
+.notes li{margin:5px 0}
+.notes b{color:var(--text-1)}
+
+@media (max-width:1100px){ .cols{grid-template-columns:repeat(2,minmax(0,1fr))} .summary{grid-template-columns:1fr} }
+@media (max-width:640px){
+  .wrap{padding:22px 16px 40px}
+  h1{font-size:21px}
+  .cols{grid-template-columns:1fr}
+  .bgrid{grid-template-columns:1fr}
+  .bin input{width:130px}
+  .kpis .grid{grid-template-columns:1fr 1fr}
+  .gauge .pv{font-size:24px; min-width:76px}
+  .glabel{margin-left:90px}
+  .card{padding:18px; border-radius:20px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div>
+      <div class="eyebrow">KEARNEY AX 교육 · IGM세계경영연구원</div>
+      <h1>교육비 시뮬레이션</h1>
+      <div class="sub">차수별 인원을 바꾸면 청구 예상액과 인재키움 잔여 지원금 대비 현황이 바로 다시 계산됩니다 · <b id="asof"></b> 모집현황 기준</div>
+    </div>
+    <button type="button" class="btn raised" id="reset">최신 현황으로 되돌리기</button>
+  </header>
+
+  <div class="summary">
+    <section class="card budget" aria-label="인재키움 잔여 지원금">
+      <h2><span>인재키움 잔여 지원금 대비</span>
+        <label class="bin">잔여 지원금 <input class="inset" type="text" inputmode="numeric" id="budget" aria-label="잔여 지원금 (원)"> 원</label>
+      </h2>
+      <div class="gauge">
+        <span class="pv" id="g-pv"></span>
+        <div class="bar inset" role="img" id="g-bar"><i id="g-fill"></i></div>
+      </div>
+      <div class="glabel"><span>총 교육비 ÷ 교육비 한도</span><span>100%</span></div>
+      <div class="bgrid">
+        <div class="bx inset"><div class="k">총 교육비</div><div class="v" id="b-fee"></div><div class="d">청구 인원 × 1인 교육비</div></div>
+        <div class="bx inset"><div class="k">교육비 한도</div><div class="v" id="b-cap"></div><div class="d">잔여 지원금 ÷ 95%</div></div>
+        <div class="bx inset"><div class="k" id="b-gap-k"></div><div class="v" id="b-gap"></div><div class="d" id="b-gap-d"></div></div>
+      </div>
+      <div class="verdict inset" id="verdict"></div>
+    </section>
+
+    <section class="card kpis" aria-label="전체 합계">
+      <h2><span>전체 합계</span></h2>
+      <div class="grid" id="kpis"></div>
+    </section>
+  </div>
+
+  <div class="section-h">
+    <h2>과정별 차수 인원</h2>
+    <p>인원은 직접 입력하거나 − / + 로 조정하세요. 금액은 모두 부가세 포함입니다.</p>
+  </div>
+  <div class="cols" id="cols"></div>
+
+  <section class="card notes">
+    <h4>산정 기준</h4>
+    <ul>
+      <li><b>총 교육비</b> = 청구 인원 × 1인 교육비 (부가세 포함). 중급·심화·파트너&amp;임원 과정 1,680,000원, MS그룹 기초 과정 800,000원.</li>
+      <li>차수별 인원은 기준일 모집현황의 <b>신청 인원</b>이며, '완료' 표시가 있는 차수는 <b>실제 참석 인원</b>입니다.</li>
+      <li><b>청구 인원</b>은 차수별 실제 교육 참여 인원입니다. 신청 마감(교육일 4일 전) 이후 취소·불참(노쇼)한 인원은 청구하지 않습니다 (계약서 제4조).</li>
+      <li><b>환급 소요액</b> = 총 교육비 × 95%. 교육시간 80% 이상을 수강해 수료한 인원만 환급됩니다.</li>
+      <li><b>교육비 한도</b> = 잔여 지원금 ÷ 95%. 총 교육비가 이 금액 안이면 잔여 지원금 안에서 환급받을 수 있습니다.</li>
+      <li><b>커니 예상 부담액</b> = 총 교육비 − 환급 가능액. 환급 가능액은 환급 소요액과 잔여 지원금 중 작은 금액입니다.</li>
+      <li>파트너&amp;임원 과정의 '청구 제외'는 환급이 적용되지 않아 청구하지 않는 인원입니다.</li>
+      <li>바꾼 인원과 지원금은 이 브라우저에만 저장됩니다. 새 모집현황이 올라오면 새 현황으로 다시 시작합니다.</li>
+    </ul>
+  </section>
+</div>
+
+<script src="data.js"></script>
+<script>
+const RATE = 0.95;
+const VNOTE = '현재까지 신청자 기준으로 불참·노쇼 인원에 대한 비용 계산을 고려하지 않은 계산이니 참고 부탁드립니다.';
+const VNOTE_DONE = '완료 차수는 실제 참석 인원, 나머지 차수는 신청 인원 기준이며 불참·노쇼 인원은 아직 반영되지 않은 계산이니 참고 부탁드립니다.';
+
+// 인원·지원금은 data.js(매일 갱신)에서 읽는다
+const DATA = window.SIM_DATA;
+const DEFAULT_BUDGET = DATA.budget;
+// 기준일이 바뀌면 보는 사람이 바꿔 둔 값 대신 새 현황을 보여 준다
+const STORE = 'kearney-ax-fee-sim-' + DATA.asOf;
+
+const COURSES = [
+  { id:'mid', name:'컨설턴트 중급', color:'var(--c1)', price:1680000,
+    desc:'하네스 엔지니어링 실전 워크숍 · 2Day 11H',
+    sessions:[
+      { key:'mid-1', label:'1차수', date:'10/16(금) · 10/18(일)' },
+      { key:'mid-2', label:'2차수', date:'10/30(금) · 11/7(토)' },
+      { key:'mid-3', label:'3차수', date:'11/8(일) · 11/15(일)' },
+      { key:'mid-4', label:'4차수', date:'11/13(금) · 11/14(토)' },
+      { key:'mid-5', label:'5차수', date:'12/5(토) · 12/12(토)' } ] },
+  { id:'adv', name:'컨설턴트 심화', color:'var(--c3)', price:1680000,
+    desc:'AI 에이전트 개발 · 2Day 11H',
+    sessions:[
+      { key:'adv-1', label:'1차수', date:'11/6(금) · 11/14(토)' },
+      { key:'adv-2', label:'2차수', date:'12/5(토) · 12/12(토)' } ] },
+  { id:'partner', name:'파트너&임원', color:'var(--c2)', price:1680000,
+    desc:'중급 (파트너&임원급) · 2Day 11H',
+    sessions:[
+      { key:'p-1', label:'1차수', date:'9/12(토) · 9/19(토)' },
+      { key:'p-2', label:'2차수', date:'10/24(토) · 10/31(토)' } ] },
+  { id:'ms', name:'MS그룹 기초', color:'var(--c4)', price:800000,
+    desc:'그룹별 맞춤 과정 · 1Day 5H',
+    sessions:[
+      { key:'ms-1', label:'HR·마케팅 1차수',   date:'10/23(금)' },
+      { key:'ms-2', label:'재무·세일즈 1차수', date:'10/30(금)' },
+      { key:'ms-3', label:'재무·세일즈 2차수', date:'11/6(금)' },
+      { key:'ms-4', label:'HR·마케팅 2차수',   date:'11/13(금)' },
+      { key:'ms-5', label:'AI 에이전트 자동화 1차수', date:'11/20(금)' },
+      { key:'ms-6', label:'AI 에이전트 자동화 2차수', date:'11/27(금)' } ] }
+];
+COURSES.forEach(c => c.sessions.forEach(s => {
+  const d = DATA.sessions[s.key] || {};
+  s.n = d.n || 0; s.done = !!d.done; s.excl = d.excl || 0;
+  s.n0 = s.n; s.excl0 = s.excl; s.hasExcl = s.excl0 > 0;
+}));
+const ANY_DONE = COURSES.some(c => c.sessions.some(s => s.done));
+const state = { budget: DEFAULT_BUDGET };
+
+// 기준일 표시: 2026-10-21 → 2026년 10월 21일(수)
+(function(){
+  const [y, m, d] = DATA.asOf.split('-').map(Number);
+  const wd = '일월화수목금토'[new Date(y, m - 1, d).getDay()];
+  document.getElementById('asof').textContent = `${y}년 ${m}월 ${d}일(${wd})`;
+})();
+
+/* storage: per-viewer convenience only */
+function save(){
+  try{
+    const sess = {};
+    COURSES.forEach(c => c.sessions.forEach(s => sess[s.key] = { n:s.n, excl:s.excl }));
+    localStorage.setItem(STORE, JSON.stringify({ sess, budget: state.budget }));
+  }catch(e){}
+}
+function load(){
+  try{
+    const d = JSON.parse(localStorage.getItem(STORE) || 'null'); if(!d) return;
+    COURSES.forEach(c => c.sessions.forEach(s => { const v = d.sess && d.sess[s.key]; if(v){ s.n = v.n; s.excl = v.excl; } }));
+    if (typeof d.budget === 'number') state.budget = d.budget;
+  }catch(e){}
+}
+
+const won = n => Math.round(n).toLocaleString('ko-KR');
+const eok = n => (n / 1e8).toFixed(2);
+const man = n => Math.round(n / 1e4).toLocaleString('ko-KR');
+const pct = n => (n * 100).toFixed(1) + '%';
+const esc = s => String(s).replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
+
+function calc(c){
+  let heads = 0, billed = 0;
+  c.sessions.forEach(s => { heads += s.n; billed += Math.max(0, s.n - s.excl); });
+  const fee = billed * c.price;
+  return { heads, billed, fee, refund: fee * RATE };
+}
+
+function buildCols(){
+  document.getElementById('cols').innerHTML = COURSES.map(c => `
+    <section class="card col" aria-label="${esc(c.name)}">
+      <h3><i class="sw" style="background:${c.color}"></i>${esc(c.name)}</h3>
+      <div class="meta">${esc(c.desc)} · 1인 ${won(c.price)}원</div>
+      <div class="big" id="${c.id}-fee"></div><div class="big-l">청구 예상액 (원)</div>
+      <div class="sess inset">
+        ${c.sessions.map(s => `
+          <div>
+            <div class="srow">
+              <div>
+                <div class="slabel">${esc(s.label)}${s.done ? '<span class="done">완료</span>' : ''}</div>
+                <div class="sdate">${esc(s.date)}</div>
+              </div>
+              <div class="step">
+                <button type="button" class="raised" data-step="${s.key}" data-d="-1" aria-label="${esc(s.label)} 인원 줄이기">−</button>
+                <input class="inset" type="number" min="0" inputmode="numeric" id="in-${s.key}" aria-label="${esc(c.name)} ${esc(s.label)} 인원">
+                <button type="button" class="raised" data-step="${s.key}" data-d="1" aria-label="${esc(s.label)} 인원 늘리기">+</button>
+              </div>
+            </div>
+            ${s.hasExcl ? `<div class="excl">청구 제외 <input class="inset" type="number" min="0" id="ex-${s.key}" aria-label="${esc(s.label)} 청구 제외 인원">명</div>` : ''}
+          </div>`).join('')}
+      </div>
+      <div class="sumr" id="${c.id}-sum"></div>
+    </section>`).join('');
+
+  COURSES.forEach(c => c.sessions.forEach(s => {
+    const inp = document.getElementById('in-' + s.key);
+    inp.addEventListener('input', () => { const v = parseInt(inp.value, 10); s.n = isNaN(v) ? 0 : Math.max(0, v); if (s.excl > s.n) s.excl = s.n; update(); });
+    inp.addEventListener('blur', () => { inp.value = s.n; });
+    const ex = document.getElementById('ex-' + s.key);
+    if (ex){
+      ex.addEventListener('input', () => { const v = parseInt(ex.value, 10); s.excl = isNaN(v) ? 0 : Math.max(0, Math.min(v, s.n)); update(); });
+      ex.addEventListener('blur', () => { ex.value = s.excl; });
+    }
+  }));
+
+  document.getElementById('cols').addEventListener('click', e => {
+    const b = e.target.closest('[data-step]'); if (!b) return;
+    const s = findSess(b.dataset.step);
+    s.n = Math.max(0, s.n + Number(b.dataset.d));
+    if (s.excl > s.n) s.excl = s.n;
+    update();
+  });
+
+  const bud = document.getElementById('budget');
+  bud.addEventListener('input', () => { state.budget = Number(bud.value.replace(/[^0-9]/g, '')) || 0; update(); });
+  bud.addEventListener('blur', () => { bud.value = won(state.budget); });
+
+  document.getElementById('reset').addEventListener('click', () => {
+    COURSES.forEach(c => c.sessions.forEach(s => { s.n = s.n0; s.excl = s.excl0; }));
+    state.budget = DEFAULT_BUDGET;
+    update();
+  });
+}
+const findSess = key => { for (const c of COURSES) for (const s of c.sessions) if (s.key === key) return s; };
+
+function update(){
+  const res = COURSES.map(c => ({ c, r: calc(c) }));
+  const T = res.reduce((a, { r }) => (a.heads += r.heads, a.billed += r.billed, a.fee += r.fee, a.refund += r.refund, a), { heads:0, billed:0, fee:0, refund:0 });
+  const B = state.budget;
+  const cap = B / RATE;
+  const gap = cap - T.fee;                        // 교육비 기준 +: 여유, -: 초과
+  const refundable = Math.min(T.refund, B);
+  const burden = T.fee - refundable;
+  const use = cap ? T.fee / cap : 0;              // = 환급 소요액 ÷ 잔여 지원금
+  const over = gap < 0;
+  const perHead = 1680000;
+
+  // inputs (keep focused field untouched)
+  COURSES.forEach(c => c.sessions.forEach(s => {
+    const inp = document.getElementById('in-' + s.key);
+    if (document.activeElement !== inp) inp.value = s.n;
+    const ex = document.getElementById('ex-' + s.key);
+    if (ex && document.activeElement !== ex) ex.value = s.excl;
+  }));
+  const bud = document.getElementById('budget');
+  if (document.activeElement !== bud) bud.value = won(B);
+
+  // course cards
+  res.forEach(({ c, r }) => {
+    document.getElementById(c.id + '-fee').textContent = won(r.fee);
+    document.getElementById(c.id + '-sum').innerHTML = `
+      <div class="r"><span>참여 인원</span><b>${r.heads}명</b></div>
+      ${r.heads !== r.billed ? `<div class="r"><span>청구 인원</span><b>${r.billed}명</b></div>` : ''}
+      <div class="r"><span>환급 소요액 (95%)</span><b>${won(r.refund)}</b></div>`;
+  });
+
+  // budget gauge
+  const color = use > 1 ? 'var(--crit)' : use > 0.9 ? 'var(--warn)' : 'var(--good)';
+  document.getElementById('g-pv').textContent = pct(use);
+  document.getElementById('g-pv').style.color = color;
+  const fill = document.getElementById('g-fill');
+  fill.style.width = Math.min(100, use * 100) + '%';
+  fill.style.background = color;
+  document.getElementById('g-bar').setAttribute('aria-label', '교육비 한도 대비 ' + pct(use));
+  document.getElementById('b-fee').textContent = won(T.fee);
+  document.getElementById('b-cap').textContent = won(Math.floor(cap));
+  document.getElementById('b-gap-k').textContent = over ? '한도 초과' : '한도 여유';
+  const gEl = document.getElementById('b-gap');
+  gEl.textContent = (over ? '▼ ' : '▲ ') + won(Math.abs(gap));
+  gEl.className = 'v ' + (over ? 'down' : 'up');
+  document.getElementById('b-gap-d').textContent = over
+    ? `168만 원 과정 약 ${Math.ceil(-gap / perHead)}명분`
+    : `168만 원 과정 약 ${Math.floor(gap / perHead)}명 더 가능`;
+  const vnote = ANY_DONE ? VNOTE_DONE : VNOTE;
+  document.getElementById('verdict').innerHTML = over
+    ? `<i class="dot" style="background:var(--crit)"></i><span>현재 인원 기준 총 교육비가 교육비 지원 한도보다 <b class="down">${man(T.fee - cap)}만 원</b> 많습니다.<span class="vnote">${vnote}</span></span>`
+    : `<i class="dot" style="background:${color}"></i><span>현재 인원 기준 총 교육비가 교육비 지원 한도 안에 있습니다. 한도까지 <b class="up">${man(cap - T.fee)}만 원</b> 남았습니다.<span class="vnote">${vnote}</span></span>`;
+
+  // KPIs
+  const kp = [
+    { k:'참여 인원', v:`${T.heads}<small>명</small>`, d:`청구 ${T.billed}명 · 4개 과정` },
+    { k:'환급 소요액', v:`${eok(T.refund)}<small>억 원</small>`, d:`총 교육비 × 95% · ${won(T.refund)}원` },
+    { k:'환급 가능액', v:`${eok(refundable)}<small>억 원</small>`, d: over ? '잔여 지원금 전액' : '환급 소요액 전액' },
+    { k:'커니 예상 부담액', v:`${eok(burden)}<small>억 원</small>`, d: over ? `자부담 5% + 지원금 초과분` : '자부담 5%', em:true }
+  ];
+  document.getElementById('kpis').innerHTML = kp.map(x => `<div class="kpi inset${x.em ? ' em' : ''}"><div class="k">${x.k}</div><div class="v">${x.v}</div><div class="d">${x.d}</div></div>`).join('');
+
+  save();
+}
+
+load();
+buildCols();
+update();
+</script>
+</body>
+</html>
