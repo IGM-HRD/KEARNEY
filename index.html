@@ -535,20 +535,24 @@ function initAdmin(){
     const api = `https://api.github.com/repos/${REPO}/contents/data.js`;
     const headers = { Authorization: 'Bearer ' + token, Accept: 'application/vnd.github+json' };
     $('adm-save').disabled = true; msg('저장 중…');
+    let step = 'read';
     try{
       const cur = await fetch(api + '?ref=main', { headers, cache: 'no-store' });
       if (!cur.ok) throw cur;
       const { sha } = await cur.json();
+      step = 'write';
       const res = await fetch(api, { method: 'PUT', headers: { ...headers, 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: `${asOf} 모집현황 반영 (페이지에서 저장)`, content: utf8b64(dataJs(asOf)), sha, branch: 'main' }) });
       if (!res.ok) throw res;
       msg('저장했습니다. 1~2분 뒤 링크에 반영됩니다. 그 뒤 새로고침하면 새 기준일로 보입니다.', 'ok');
     }catch(err){
       const st = err && err.status;
-      msg(st === 401 ? 'GitHub 키가 맞지 않거나 기한이 지났습니다. 키를 다시 넣어 주세요.'
-        : st === 403 || st === 404 ? '이 키로는 저장 권한이 없습니다. KEARNEY 저장소의 Contents 쓰기 권한을 확인해 주세요.'
+      const denied = st === 403 || st === 404;
+      msg((st === 401 ? 'GitHub 키가 맞지 않거나 기한이 지났습니다. 키를 다시 넣어 주세요.'
+        : denied && step === 'read' ? '이 키로는 KEARNEY 저장소에 접근할 수 없습니다. 키 설정의 Repository access에 IGM-HRD/KEARNEY가 선택돼 있는지 확인해 주세요.'
+        : denied ? '이 키는 읽기만 됩니다. 키 설정의 Permissions에서 Contents를 Read and write로 바꿔 주세요.'
         : st === 409 ? '다른 저장과 겹쳤습니다. 잠시 뒤 다시 저장해 주세요.'
-        : '저장하지 못했습니다. 인터넷 연결을 확인하고 다시 시도해 주세요.', 'err');
+        : '저장하지 못했습니다. 인터넷 연결을 확인하고 다시 시도해 주세요.') + (st ? ` (오류 ${st})` : ''), 'err');
     }finally{
       $('adm-save').disabled = false;
     }
