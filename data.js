@@ -10,8 +10,8 @@ window.SIM_DATA = {
     'mid-1': { n: 30, done: true },
     'mid-2': { n: 35 },
     'mid-3': { n: 36 },
-    'mid-4': { n: 35 },
-    'mid-5': { n: 13 },
+    'mid-4': { n: 33 },
+    'mid-5': { n: 14 },
 
     'adv-1': { n: 29 },
     'adv-2': { n: 29 },
