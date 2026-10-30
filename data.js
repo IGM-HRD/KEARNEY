@@ -17,7 +17,7 @@ window.SIM_DATA = {
     'adv-2': { n: 28 },
 
     'p-1': { n: 10, excl: 6, done: true },
-    'p-2': { n: 16, excl: 12, note: "명단 24명 중 4명 불참, MS 임원 2명 제외" },
+    'p-2': { n: 16, excl: 8, note: "명단 24명 중 4명 불참, MS 임원 2명 제외" },
 
     'ms-1': { n: 6, done: true },
     'ms-2': { n: 5 },
