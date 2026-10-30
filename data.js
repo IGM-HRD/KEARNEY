@@ -8,12 +8,12 @@ window.SIM_DATA = {
   budget: 334497552,
   sessions: {
     'mid-1': { n: 30, done: true },
-    'mid-2': { n: 35 },
+    'mid-2': { n: 34 },
     'mid-3': { n: 36 },
     'mid-4': { n: 33 },
     'mid-5': { n: 14 },
 
-    'adv-1': { n: 28 },
+    'adv-1': { n: 27 },
     'adv-2': { n: 28 },
 
     'p-1': { n: 10, excl: 6, done: true },
