@@ -5,7 +5,7 @@
 //  - free: true면 무상 차수. 인원은 세되 전원 청구 제외 (환급 신고 안 함)
 //  - note: 메모 (페이지에는 보이지 않음)
 window.SIM_DATA = {
-  asOf: '2026-11-04',
+  asOf: '2026-11-06',
   budget: 334497552,
   sessions: {
     'mid-1': { n: 30, done: true },
@@ -14,7 +14,7 @@ window.SIM_DATA = {
     'mid-4': { n: 33 },
     'mid-5': { n: 18 },
 
-    'adv-1': { n: 25 },
+    'adv-1': { n: 19 },
     'adv-2': { n: 31, free: true },
 
     'p-1': { n: 10, excl: 6, done: true },
