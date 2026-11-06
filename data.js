@@ -14,7 +14,7 @@ window.SIM_DATA = {
     'mid-4': { n: 33 },
     'mid-5': { n: 18 },
 
-    'adv-1': { n: 19 },
+    'adv-1': { n: 18 },
     'adv-2': { n: 31, free: true },
 
     'p-1': { n: 10, excl: 6, done: true },
