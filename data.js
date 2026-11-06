@@ -11,11 +11,11 @@ window.SIM_DATA = {
     'mid-1': { n: 30, done: true },
     'mid-2': { n: 33 },
     'mid-3': { n: 36 },
-    'mid-4': { n: 33 },
-    'mid-5': { n: 18 },
+    'mid-4': { n: 38 },
+    'mid-5': { n: 14 },
 
     'adv-1': { n: 17 },
-    'adv-2': { n: 33, free: true },
+    'adv-2': { n: 34, free: true },
 
     'p-1': { n: 10, excl: 6, done: true },
     'p-2': { n: 16, excl: 7, done: true, note: "명단 24명 중 4명 불참, MS 임원 2명 제외" },
