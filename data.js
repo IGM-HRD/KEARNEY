@@ -10,7 +10,7 @@ window.SIM_DATA = {
   sessions: {
     'mid-1': { n: 30, done: true },
     'mid-2': { n: 34 },
-    'mid-3': { n: 36 },
+    'mid-3': { n: 37 },
     'mid-4': { n: 38 },
     'mid-5': { n: 12 },
 
