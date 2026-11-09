@@ -9,8 +9,8 @@ window.SIM_DATA = {
   budget: 334497552,
   sessions: {
     'mid-1': { n: 30, done: true },
-    'mid-2': { n: 34 },
-    'mid-3': { n: 37 },
+    'mid-2': { n: 34, done: true },
+    'mid-3': { n: 35 },
     'mid-4': { n: 38 },
     'mid-5': { n: 13 },
 
@@ -21,8 +21,8 @@ window.SIM_DATA = {
     'p-2': { n: 16, excl: 7, done: true, note: "명단 24명 중 4명 불참, MS 임원 2명 제외" },
 
     'ms-1': { n: 6, done: true },
-    'ms-2': { n: 5 },
-    'ms-3': { n: 4 },
+    'ms-2': { n: 5, done: true },
+    'ms-3': { n: 4, done: true },
     'ms-4': { n: 8 },
     'ms-5': { n: 13 },
     'ms-6': { n: 6 }
