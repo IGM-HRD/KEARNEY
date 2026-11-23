@@ -5,16 +5,16 @@
 //  - free: true면 무상 차수. 인원은 세되 전원 청구 제외 (환급 신고 안 함)
 //  - note: 메모 (페이지에는 보이지 않음)
 window.SIM_DATA = {
-  asOf: '2026-11-19',
+  asOf: '2026-11-23',
   budget: 334497552,
   sessions: {
     'mid-1': { n: 30, done: true },
     'mid-2': { n: 34, done: true },
     'mid-3': { n: 35, done: true },
     'mid-4': { n: 41, done: true },
-    'mid-5': { n: 15 },
+    'mid-5': { n: 14 },
 
-    'adv-1': { n: 17 },
+    'adv-1': { n: 17, done: true },
     'adv-2': { n: 33, free: true },
 
     'p-1': { n: 10, excl: 6, done: true },
@@ -24,7 +24,7 @@ window.SIM_DATA = {
     'ms-2': { n: 5, done: true },
     'ms-3': { n: 4, done: true },
     'ms-4': { n: 8, done: true },
-    'ms-5': { n: 14 },
+    'ms-5': { n: 12, done: true },
     'ms-6': { n: 9 }
   }
 };
