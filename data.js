@@ -24,7 +24,7 @@ window.SIM_DATA = {
     'ms-2': { n: 5, done: true },
     'ms-3': { n: 4, done: true },
     'ms-4': { n: 8, done: true },
-    'ms-5': { n: 12, done: true },
-    'ms-6': { n: 8 }
+    'ms-5': { n: 13, done: true },
+    'ms-6': { n: 7 }
   }
 };
